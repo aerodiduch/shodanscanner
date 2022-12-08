@@ -6,7 +6,7 @@ from openpyxl import Workbook
 from openpyxl import styles
 import argparse
 
-api = shodan.Shodan('Dw1GEo0a5pZjc1Uvimy4N87I7lKr9dms')
+api = shodan.Shodan('')
 
 
 parser = argparse.ArgumentParser(
