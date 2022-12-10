@@ -6,11 +6,11 @@ from openpyxl import Workbook
 from openpyxl import styles
 import argparse
 
-api = shodan.Shodan('')
+api = shodan.Shodan('') #Insert API key.
 
 
 parser = argparse.ArgumentParser(
-    prog='shodanfinder',
+    prog='shodanscanner',
     description='Simple script to bulk scan IPs on Shodan',
     epilog='made by aerodiduch. https://github.com/aerodiduch'
 )
@@ -31,7 +31,15 @@ args = parser.parse_args()
 
 
 
-def load_data(filename):
+def load_data(filename: str) -> list:
+    '''Loads data from specified target file
+
+    Args:
+        filename (str): File containing hosts data
+
+    Returns:
+        list: List contaning hosts
+    '''
     hosts = []
     with open(filename, 'r') as fh:
         for line in fh:
@@ -41,7 +49,15 @@ def load_data(filename):
     return hosts
 
 
-def save_data(data, workbook, filename):
+def save_data(data: list, workbook: Workbook, filename: str):
+    '''Saves parsed data to output XLSX file.
+
+    Args:
+        data (list): API response from Shodan
+        workbook (Workbook): Workbook object to write
+        filename (str): Output filename
+    '''
+    
     ws = workbook.active
     
     if 'ports' in data:
@@ -69,7 +85,24 @@ def save_data(data, workbook, filename):
         [data['ip_str'], data['isp'], data['asn'], data['city'], ports, '', vulns, data['last_update'], domains]
     )
     workbook.save(f'{filename}.xlsx')
+    
+def request_data(data: list, output_name: str):
+    '''Request data to Shodan API
 
+    Args:
+        data (list): List of hosts
+        output_name (str): Fiilename to write to.
+    '''
+    print(f'-> Ready to scan {len(data)} hosts...\n')
+    for host in data:
+        try:
+            host_info = api.host(host)
+            save_data(host_info, wb, output_name)
+        except shodan.APIError as e:
+            if 'IP' in e.args[0]:
+                print(f'-> No results for {host}')
+            continue
+    print(f'\n-> Finished scan. Results dumped to "{output_name}.xlsx"')
 
 
 if __name__ == '__main__':
@@ -81,6 +114,4 @@ if __name__ == '__main__':
     if args.file:
         output_name = args.output if args.output is not None else 'results'
         data = load_data(args.file)
-        for host in data:
-            host_info = api.host(host)
-            save_data(host_info, wb, output_name)
+        request_data(data, output_name)
