@@ -1,127 +1,41 @@
-
 # shodanscanner
 
-Bulk scanner of IPs through Shodan, dumping data to an Excel file including location, ISP, CVEs, among others.
+[![License: MIT](https://img.shields.io/github/license/aerodiduch/shodanscanner)](LICENSE) ![Python](https://img.shields.io/badge/python-3776AB?logo=python&logoColor=white) ![Shodan API](https://img.shields.io/badge/API-Shodan-B80000)
 
-> Warning. This a WIP project. I'm constantly making new changes. Some things may not work as intented.
+[Español](README.es.md)
 
-# Installation
+Bulk-checks a list of IP addresses on Shodan and dumps what it finds into an Excel file: ISP, ASN, city, open ports, CVEs, last update and domains, one row per IP.
 
-There is two ways to install and use `shodanscanner`
+## Install
 
-## Using virtual enviroments
+You need Python 3 and a Shodan API key, which you'll find at https://account.shodan.io/.
 
-If you want to use `shodanscanner` inside a python's virtual enviroment:
-
-```
+```sh
 git clone https://github.com/aerodiduch/shodanscanner
 cd shodanscanner
 python -m venv venv
-venv/Scripts/activate
+source venv/bin/activate        # on Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python shodanscanner.py
 ```
 
-Then, everytime you use the tool you have to activate the virtual enviroment and then use the tool, like this:
+The first time you run it, it asks for the API key and saves it in a `.env` file in the same folder. To change it later, edit that file.
 
-```
-cd shodanscanner
-venv/Scripts/activate
-python shodanscanner.py ...
-```
+## Usage
 
-
-## Normal installation
-
-If you don't mind about isolating dependencies:
-
-```
-git clone https://github.com/aerodiduch/shodanscanner
-cd shodanscanner
-pip install -r requirements.txt
-python shodanscanner.py ...
+```sh
+python shodanscanner.py -f my_ips.txt -o ip_data
 ```
 
-# Usage
-## Setting up API KEY
+- `-f`: a text file with one IP per line.
+- `-o`: name of the Excel file, without the extension (default `results`). It adds `.xlsx` itself.
 
-In order to use `shodanscanner` you need a Shodan's API KEY. You can find it on https://account.shodan.io/. 
+It shows a progress bar and, at the end, lists the IPs Shodan had no data for. The Excel has these columns: IP, ISP, ASN, LOCATION, PORTS, PRODUCTS, CVEs, LAST UPDATED, DOMAINS.
 
-When running `shodanscanner` for the first time, a setup function will run.
+## Limitations
 
-`python shodanscanner.py`
+- `-t` (a single IP) shows up in the help but isn't wired up yet. For one IP, use a file with one line.
+- The PRODUCTS column stays empty.
 
-```
-[!!!] No API KEY detected.
+## License
 
-This will be prompted only one time to set API KEY.
-A .env file will be created containing it.
-You will find your Shodan API KEY on https://account.shodan.io/
-
-You can change it later editing the .env file created on this directory.
-If no valid API KEY is provided, shodanscanner can not make requests through Shodan API.
-
-[!] Paste your API KEY:
-```
-
-You just need to paste your API KEY and now you can freely use `shodanscanner`. 
-
-This will create a `.env` file which will store your API KEY and load it every time you execute `shodanscanner`. You can edit this file to replace your API KEY if needed.
-
-## Help command
-
-Executing `shodanscanner` without parameters or by passing `-h` flag will output the following:
-
-```
-usage: shodanscanner [-h] [-f FILE] [-t TARGET] [-o OUTPUT]
-
-Simple script to bulk scan IPs on Shodan
-
-options:
-  -h, --help            show this help message and exit
-  -f FILE, --file FILE  File containing IP address to scan. Input must be one IP per line.
-  -t TARGET, --target TARGET
-                        Scan a single target, e.g: -t 200.100.20.10
-  -o OUTPUT, --output OUTPUT
-                        Name of the output file without extension. Default value is "results".
-
-made by aerodiduch. https://github.com/aerodiduch
-```
-
-## Usage example
-
-You need a file containing a list of IPs, containing one per line.
-> `my_ip_list.txt`
-```
-108.141.106.44
-221.245.33.2
-190.64.250.30
-178.97.75.163
-61.54.54.98
-```
-
-Then, you execute `shodanscanner` passing the `-f` flag with the directory of your file.
-
-> Note: You can pass `-o` flag to specify output filename. It is **not** necessary to add `.xlsx` extension, since `shodanscanner` does it for you. In case output filename is not provided, it defaults to `results`.
-
-`python shodanscanner.py -f my_ip_list.txt -o ip_data`
-
-```
--> Ready to scan X hosts...
-
-100%|██████████████████████| 15/15 [00:21<00:00,  1.29s/it] 
-
--> Finished scan. Results dumped to "ip_data.xlsx"
-
-No results found for: IP1, IP2...
-```
-
-
-# Authors
-
-Pending
-
-# Contribution
-
-Pending
-
+MIT, see [LICENSE](LICENSE).
